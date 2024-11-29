@@ -57,7 +57,17 @@
         margin-right: auto;
     }
     button {
-        background-color:
+        background-color:tomato;
+        border:none;
+        color:black;
+        padding:4px 24px;
+        text-align:center;
+        font-size:14px;
+        transition-duration: 0.3s;
+    }
+    button:hover {
+        background-color:orange;
+        color:white;
     }
 
     </style>
