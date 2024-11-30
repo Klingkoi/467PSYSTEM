@@ -1,5 +1,6 @@
 <?php
   include('secret.php');
+  //include('js.php');
 
   try {
     $dsn = "mysql:host=courses;dbname=".$username;
@@ -107,7 +108,7 @@
                     <th style="background-color:White">Part Number</th>
                     <th style="background-color:White">Description</th>
                     <th style="background-color:White">Price (USD)</th>
-                    <th style="background-color:White">Weight</th>
+                    <th style="background-color:White">Weight (lbs)</th>
                     <th style="background-color:White">Image</th>
                     <th style="background-color:White;bold">Quantity On Hand</th>
                 </tr>
@@ -121,7 +122,7 @@
                             echo "<td>$row[0]</td>";
                             echo "<td>$row[1]</td>";
                             echo "<td>$row[4]</td>";
-                            echo "<td>$row[5]</td>";
+                            echo "<td>$$row[5]</td>";
                             echo "<td>$row[6]</td>";
                             echo "<td><img src=\"$row[7]\" width=\"100\"</td>"; 
                             echo "<td style=\"font-weight: bold\">$row[2]</td>";
