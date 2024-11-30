@@ -29,7 +29,7 @@
     <body style="background-color:Turquoise;">
     <div class="div1">
         <h1 style="text-align:center;"> Car Parts Receiving Desk </h1>
-        <p>Welcome, Inventory Manager! Update item quantity here.</p>
+        <p>Welcome, Inventory Manager! Update part quantity here.</p>
     
     <style>
     table, th {
@@ -71,8 +71,8 @@
 
         <div class="div2" id="Qs">
             <form action="" method="post">
-                <label for="item">Pick an item to update the quantity of: </label>
-                <!-- Create Dropdown of items to update -->
+                <label for="part">Pick an part to update the quantity of: </label>
+                <!-- Create Dropdown of parts to update -->
                 <select name="dropdown" id="dropdown">
                     <?php
                         $prepared = $pdo->prepare("SELECT number,description FROM parts ORDER BY number ASC");
