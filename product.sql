@@ -9,14 +9,6 @@ CREATE TABLE parts (
     pictureURL VARCHAR(255)
 );
 --
-CREATE TABLE parts (
-    number INT AUTO_INCREMENT PRIMARY KEY,
-    description VARCHAR(100) NOT NULL,
-    price FLOAT(8, 2) NOT NULL,
-    weight FLOAT(4, 2) NOT NULL,
-    pictureURL VARCHAR(255)
-);
---
 CREATE TABLE inventory (
     inventory_id INT AUTO_INCREMENT PRIMARY KEY,
     part_number INT NOT NULL,
