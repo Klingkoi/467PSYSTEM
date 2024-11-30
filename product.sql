@@ -1,5 +1,6 @@
-DROP TABLE IF EXISTS inventory, customers, orders, order_details, shipping_charges, admins;
-DROP TABLE IF EXISTS parts;
+DROP TABLE IF EXISTS order_details; -- order_details references parts and orders
+DROP TABLE IF EXISTS inventory, orders; -- inventory references parts, orders references customers
+DROP TABLE IF EXISTS parts, customers, shipping_charges, admins;
 --
 CREATE TABLE parts (
     number INT AUTO_INCREMENT PRIMARY KEY,
