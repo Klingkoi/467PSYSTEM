@@ -1,6 +1,5 @@
 <?php
   include('secret.php');
-  //include('js.php');
 
   try {
     $dsn = "mysql:host=courses;dbname=".$username;
@@ -104,13 +103,13 @@
                 <!-- Table headers -->
                 <th colspan="7" style="background-color:White">Inventory</th>
                 <tr>
-                    <th style="background-color:White">inventory_id</th>
-                    <th style="background-color:White">part_number</th>
-                    <th style="background-color:White">description</th>
-                    <th style="background-color:White">price</th>
-                    <th style="background-color:White">weight</th>
-                    <th style="background-color:White">pictureURL</th>
-                    <th style="background-color:White;bold">quantity_on_hand</th>
+                    <th style="background-color:White">Inventory ID</th>
+                    <th style="background-color:White">Part Number</th>
+                    <th style="background-color:White">Description</th>
+                    <th style="background-color:White">Price (USD)</th>
+                    <th style="background-color:White">Weight</th>
+                    <th style="background-color:White">Image</th>
+                    <th style="background-color:White;bold">Quantity On Hand</th>
                 </tr>
                 <!-- Table data -->
                 <?php
@@ -125,7 +124,7 @@
                             echo "<td>$row[5]</td>";
                             echo "<td>$row[6]</td>";
                             echo "<td><img src=\"$row[7]\" width=\"100\"</td>"; 
-                            echo "<td>$row[2]</td>";
+                            echo "<td style=\"font-weight: bold\">$row[2]</td>";
                         echo "</tr>";
                         $row = $prepared->fetch(PDO::FETCH_NUM);  
                     }
