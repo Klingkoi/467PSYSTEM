@@ -14,6 +14,7 @@
 
 <html>
     <head>
+        <!-- Separating Divisions -->
     <style>
         .div1 {
             border:4px outset lightGrey;
@@ -23,6 +24,16 @@
         .div2 {
             text-align: center;
         }
+        .div3 {
+            border:none;
+            background-color:silver;
+            text-align:left;
+            visibility:collapse;
+        }
+        .div4 {
+            text-align: center;
+        }
+
     </style>
         <title> Project - Product System </title>
     </head>
@@ -72,10 +83,14 @@
 
     </style>
 
+    <!-- This button swaps views between the orders and brackets -->
     <button onclick="toggleDisplay()">Swap Views</button>
     <p></p>
-    </div> </br > 
-    <table class="center" style="width:50%;" id="bracketView">
+    <!-- Brackets Table View -->
+    </div> </br >
+
+    <div class="div4" id="bracketView">
+    <table class="center" style="width:50%;" id="bracketTable">
         <!-- Table headers -->
         <th colspan="7" style="background-color:White">Weight Brackets</th>
         <tr>
@@ -101,26 +116,60 @@
                 echo "<td>$ $row[1]</td>";
             echo "</tr>";
         ?>
-        </table> </br> <!-- End of table -->
+    </table> </br> 
+    </div>
+    <!-- End of table -->
 
+    <!-- Brackets DB Editting-->
         <div class="div2" id="Qs">
             <form action="" method="post">
                 <label for="bracket">Put a new bracket limiter: </label>
                 <input type="number" id="bracket" name="bracket" min="0"/>
                 <label for"cost"> Provide a cost for the new bracket: </label>
                 <input type="number" id="cost" name="cost" min="0" step=".01"/>
-                <input type="submit" id="submitted" name="submitted" value ="Enter"/>
+                <input type="submit" id="submitted" name="submitted" value ="Add"/>
             </form>
             <form action="" method="post">
                 <label for="bracket">Pick a bracket limiter to remove: </label>
                 <input type="number" id="rBracket" name="rBracket" min="1"/>
-                <input type="submit" id="submitted" name="submitted" value ="Enter"/>
+                <input type="submit" id="submitted" name="submitted" value ="Remove"/>
             </form>
         </div>
+
+    <!-- Orders Table View-->
+    
+    <!-- Sort by Options -->
+    <div class="div3" id="SortBy">
+        <form action="" method="post">
+                <p style="text-align:center;">Adjust search: </p>
+                <!-- // Date Search -->
+                <label for="dateStart">Dates from: </label>
+                <input type="date" id="dateStart" name="dateStart" value="2000-01-01"/>
+                <label for="dateEnd"> to: </label>
+                <input type="date" id="dateEnd" name="dateEnd" value="2025-01-01"/>
+                <!-- // Price Search -->
+                <label for="priceStart"> Totals from: </label>
+                <input type="number" id="priceStart" name="priceStart" value="0" min="0"/>
+                <label for="priceEnd"> to: </label>
+                <input type="number" id="priceEnd" name="priceEnd" value="99999" min="0" max="99999"/>
+                <!-- Order Status Search -->
+                <label for="status"> Status:  </label>
+                <select type="text" id="status" name="status" value="All">
+                    <option value="All">All</option>
+                    <option value="Authorized">Authorized</option>
+                    <option value="Packed">Packed</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <input type="submit" id="submitted" name="submitted" value ="Search"/>
+        </form>
+    </div>
             <?php
+            // Add a new bracket limiter
             if(isset($_POST["bracket"]) && isset($_POST["cost"])) {
                 $pdo->exec("INSERT INTO Brackets VALUES(".$_POST["bracket"].", ".$_POST["cost"].");");
                 }
+            // Remove a bracket limiter
             else if(isset($_POST["rBracket"])) {
                 $pdo->exec("DELETE FROM Brackets WHERE bracket_upper = ".$_POST["rBracket"].";");
                 }
