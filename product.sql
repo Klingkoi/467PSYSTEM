@@ -29,6 +29,7 @@ CREATE TABLE orders (
     customer_id INT NOT NULL,
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     total_price FLOAT(10, 2) NOT NULL,
+    total_weight FLOAT(4, 2) NOT NULL,
     shipping_cost FLOAT(10, 2) NOT NULL,
     order_status ENUM('Authorized', 'Packed', 'Shipped', 'Completed') DEFAULT 'Authorized',
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
@@ -39,7 +40,6 @@ CREATE TABLE order_details (
     order_id INT NOT NULL,
     part_number INT NOT NULL,
     quantity INT NOT NULL,
-    price_per_item FLOAT(10, 2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (part_number) REFERENCES parts(number)
 );
@@ -57,7 +57,7 @@ CREATE TABLE admins (
     password_hash VARCHAR(255) NOT NULL
 );
 
---------------------------------------------------------- Sample Data from ChatGPT
+--------------------------------------------------------- Sample Data from ChatGPT (can likely be removed when we're done)
 
 -- Insert sample data into parts table
 INSERT INTO parts (description, price, weight, pictureURL) VALUES
@@ -80,17 +80,17 @@ INSERT INTO customers (name, email, address) VALUES
 ('Emily Johnson', 'emily.johnson@example.com', '789 Oak St, Springfield, IL');
 
 -- Insert sample data into orders table
-INSERT INTO orders (customer_id, total_price, shipping_cost, order_status) VALUES
-(1, 39.98, 5.99, 'Authorized'),
-(2, 9.99, 2.99, 'Packed'),
-(3, 89.99, 10.99, 'Shipped');
+INSERT INTO orders (customer_id, total_price, total_weight, shipping_cost, order_status) VALUES
+(1, 39.98, 10.5, 5.99, 'Authorized'),
+(2, 9.99, 3.2, 2.99, 'Packed'),
+(3, 89.99, 20.2, 10.99, 'Shipped');
 
 -- Insert sample data into order_details table
-INSERT INTO order_details (order_id, part_number, quantity, price_per_item) VALUES
-(1, 1, 1, 29.99),
-(1, 2, 1, 9.99),
-(2, 2, 1, 9.99),
-(3, 4, 1, 89.99);
+INSERT INTO order_details (order_id, part_number, quantity) VALUES
+(1, 1, 1),
+(1, 2, 1),
+(2, 2, 1),
+(3, 4, 1);
 
 -- Insert sample data into shipping_charges table
 INSERT INTO shipping_charges (weight_lower_bound, weight_upper_bound, charge) VALUES
