@@ -1,58 +1,8 @@
-DROP TABLE IF EXISTS inventory, customers, orders, order_details, shipping_charges, admins;
-DROP TABLE IF EXISTS parts;
---
-CREATE TABLE parts (
-    number INT AUTO_INCREMENT PRIMARY KEY,
-    description VARCHAR(100) NOT NULL,
-    price FLOAT(8, 2) NOT NULL,
-    weight FLOAT(4, 2) NOT NULL,
-    pictureURL VARCHAR(255)
-);
---
-CREATE TABLE inventory (
-    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
-    part_number INT NOT NULL,
-    quantity_on_hand INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (part_number) REFERENCES parts(number)
-);
---
-CREATE TABLE customers (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    address TEXT NOT NULL
-);
---
-CREATE TABLE orders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    total_price FLOAT(10, 2) NOT NULL,
-    shipping_cost FLOAT(10, 2) NOT NULL,
-    order_status ENUM('Authorized', 'Packed', 'Shipped', 'Completed') DEFAULT 'Authorized',
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-);
---
-CREATE TABLE order_details (
-    order_detail_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    part_number INT NOT NULL,
-    quantity INT NOT NULL,
-    price_per_item FLOAT(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (part_number) REFERENCES parts(number)
-);
---
-CREATE TABLE shipping_charges (
-    charge_id INT AUTO_INCREMENT PRIMARY KEY,
-    weight_lower_bound FLOAT(5, 2) NOT NULL,
-    weight_upper_bound FLOAT(5, 2) NOT NULL,
-    charge FLOAT(10, 2) NOT NULL
-);
---
-CREATE TABLE admins (
-    admin_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL
-);
---
+CREATE TABLE Inventory(part_ID int AUTO_INCREMENT, quantity int DEFAULT 0, PRIMARY KEY (part_ID));
+CREATE TABLE Cart(part_ID int, quantity int NOT NULL, PRIMARY KEY (part_ID));
+
+-- Some temp data added --
+UPDATE Inventory SET quantity = 10 WHERE part_ID = 1;
+UPDATE Inventory SET quantity = 10 WHERE part_ID = 2;
+INSERT INTO Inventory VALUES (),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),(),();
+INSERT INTO Cart VALUES (2,2);
