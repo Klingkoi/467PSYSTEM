@@ -4,15 +4,18 @@
         function toggleDisplay() {
             var brackets = document.getElementById('bracketView');
             var bracketQs = document.getElementById('Qs');
+            var ordersSort = document.getElementById('SortBy');
 
 
-            if(brackets.style.visibility == 'collapse') {
-               brackets.style.visibility = 'visible';
-               bracketQs.style.visibility = 'visible';
+            if(brackets.style.display == 'none') {
+                brackets.style.display = 'inline';
+                bracketQs.style.display = 'inline';
+                ordersSort.style.visibility = 'collapse';
             }
             else {
-                brackets.style.visibility = 'collapse';
-                bracketQs.style.visibility = 'collapse';
+                brackets.style.display = 'none';
+                bracketQs.style.display = 'none';
+                ordersSort.style.visibility = 'visible';
             }
         }
     </script>
