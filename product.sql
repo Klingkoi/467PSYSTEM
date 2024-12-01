@@ -23,12 +23,12 @@ CREATE TABLE customers (
     email VARCHAR(100) NOT NULL UNIQUE,
     address TEXT NOT NULL
 );
---
+--total_price will INCLUDE shipping
 CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    total_price FLOAT(10, 2) NOT NULL,
+    total_price FLOAT(10, 2) NOT NULL, 
     total_weight FLOAT(4, 2) NOT NULL,
     shipping_cost FLOAT(10, 2) NOT NULL,
     order_status ENUM('Authorized', 'Packed', 'Shipped', 'Completed') DEFAULT 'Authorized',
@@ -81,9 +81,9 @@ INSERT INTO customers (name, email, address) VALUES
 
 -- Insert sample data into orders table
 INSERT INTO orders (customer_id, total_price, total_weight, shipping_cost, order_status) VALUES
-(1, 39.98, 10.5, 5.99, 'Authorized'),
-(2, 9.99, 3.2, 2.99, 'Packed'),
-(3, 89.99, 20.2, 10.99, 'Shipped');
+(1, 45.97, 3.5, 5.99, 'Authorized'),
+(2, 12.98, 0.2, 2.99, 'Authorized'),
+(3, 100.98, 10.2, 10.99, 'Shipped');
 
 -- Insert sample data into order_details table
 INSERT INTO order_details (order_id, part_number, quantity) VALUES
