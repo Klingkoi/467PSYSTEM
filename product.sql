@@ -16,6 +16,15 @@ CREATE TABLE customers (
     address TEXT NOT NULL
 );
 --
+CREATE TABLE parts (
+    number INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(50) NOT NULL,
+    price FLOAT (8, 2) NOT NULL,
+    weight FLOAT (4, 2) NOT NULL,
+    pictureURL varchar(50)
+
+);
+--
 CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
