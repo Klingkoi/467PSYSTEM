@@ -3,6 +3,15 @@
   include('js.php');
 
   try {
+    $dsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
+    $legacypdo = new PDO($dsn, "student", "student");
+    $legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  }
+  catch (PDOexception $e) {
+    echo "Connection to database failed: ".$e->getMessage();
+  } 
+
+  try {
     $dsn = "mysql:host=courses;dbname=".$username;
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -186,11 +195,11 @@
                     $pEnd = $_GET["priceEnd"];
                     $status = $_GET["status"];
                     if($status == "All") { // Need because all is not a status, but instead refers to any status
-                        $sql = "SELECT order_id, total_price, total_weight, order_status, customer_id,shipping_cost FROM orders WHERE order_date >= '$dStart' AND order_date <= '$dEnd' AND total_price >= $pStart AND total_price <= $pEnd ORDER BY order_id ASC";
+                        $sql = "SELECT order_id, total_price, total_weight, order_status, customer_id,shipping_cost, order_date FROM orders WHERE order_date >= '$dStart' AND order_date <= '$dEnd' AND total_price >= $pStart AND total_price <= $pEnd ORDER BY order_id ASC";
                         $nSQL = "SELECT count(*) FROM orders WHERE order_date >= '$dStart' AND order_date <= '$dEnd' AND total_price >= $pStart AND total_price <= $pEnd";
                     }
                     else { // All orders with any number of modifications
-                        $sql = "SELECT order_id, total_price, total_weight, order_status, customer_id,shipping_cost FROM orders WHERE order_date >= '$dStart' AND order_date <= '$dEnd' AND total_price >= $pStart AND total_price <= $pEnd AND order_status = '$status' ORDER BY order_id ASC";
+                        $sql = "SELECT order_id, total_price, total_weight, order_status, customer_id,shipping_cost, order_date FROM orders WHERE order_date >= '$dStart' AND order_date <= '$dEnd' AND total_price >= $pStart AND total_price <= $pEnd AND order_status = '$status' ORDER BY order_id ASC";
                         $nSQL = "SELECT count(*) FROM orders WHERE order_date >= '$dStart' AND order_date <= '$dEnd' AND total_price >= $pStart AND total_price <= $pEnd AND order_status = '$status'";
                     }
                     // Making the table
@@ -201,25 +210,36 @@
                     while($row) {
                         echo "<tr>";
                             echo "<td>Order Number: $row[0]($row[3]) </td>";
-                            echo "<td>$row[1] </td>";
+                            echo "<td> $row[6]</td>";
                             echo "<td>Total(w/o Shipping): $row[1] </td>";
                             echo "<td> 
                                     <div class=\"button\">
-                                        <a href=\"#popup-box-$row[0]\">Order Details $row[0]</a>
+                                        <a href=\"#popup-box-$row[0]\">Order $row[0] Details</a>
                                     </div>
                                   </td>";
+
                             //Prepare part listing with quantity
-                            $preparedParts = $pdo->prepare("SELECT order_details.part_number, order_details.quantity,
-                                                                parts.description, parts.price
-                                                                FROM order_details 
-                                                                INNER JOIN parts ON parts.number = order_details.part_number
-                                                                WHERE order_details.order_id = $row[0]
-                                                                ORDER BY parts.number ASC");
-                            $preparedParts->execute();
-                            $partRow = $preparedParts->fetch(PDO::FETCH_NUM);   
+                            $orderPrepared = $pdo->prepare("SELECT * FROM order_details ORDER BY part_number ASC");
+                            $legacyprepared = $legacypdo->prepare("SELECT * FROM parts ORDER BY number ASC");
+            
+                            $orderPrepared->execute();
+                            $inventory = $orderPrepared->fetchAll(PDO::FETCH_ASSOC);      
+
+                            $legacyprepared->execute();
+                            $parts = $legacyprepared->fetchAll(PDO::FETCH_ASSOC);   
                             
-                            $preparedCustomer = $pdo->prepare("SELECT name, email, address FROM customers 
-                                                       WHERE customer_id = $row[4]");
+                            //Join Tables with arrays since can't join tables from 2 different PDOs
+                            $joinedDetailsAndInventory = [];
+                            foreach($order_detail as $entry)
+                            {
+                                foreach ($parts as $part) {
+                                    //if order_details.part_number == parts.number
+                                    if($entry["part_number"] == $part["number"] && $entry["order_id"] == $row[0])
+                                        $joinedDetailsAndInventory[] = array_merge($entry, $part);
+                                }
+                            }
+                            
+                            $preparedCustomer = $legacypdo->prepare("SELECT name, street, city, contact FROM customers WHERE id = $row[4]");
                             $preparedCustomer->execute();
                             $custRow = $preparedCustomer->fetch(PDO::FETCH_NUM);   
 
@@ -227,33 +247,37 @@
                             echo "<div id=\"popup-box-$row[0]\" class=\"modal\">
                                     <div class=\"content\">
                                         <h1>Order $row[0]</h1>";
+                            echo "<a href=\"#\" style=\"position:absolute; color: #fe0606; 
+                                                        top:10px; right:10px\">&times;</a>";
                             echo "<h3>Packing List/Invoice:</h3>";
-                            while($partRow) {
-                                $partTempTotal = $partRow[3] * $partRow[1];
-                                echo "<p>$partRow[2] x $partRow[1] ($$partRow[3] x $partRow[1] = $$partTempTotal)</p>";
-                                $partRow = $preparedParts->fetch(PDO::FETCH_NUM);
+                            foreach($joinedDetailsAndInventory as $partRow) {
+                                $partTempTotal = $partRow["price"] * $partRow["quantity"];
+                                echo '<p>$partRow["description"] x $partRow["quantity"] ($$partRow["price"] x $partRow["quantity"] = $$partTempTotal)</p>';
                             }
-                            $subtotal = $row[1] - $row[5]; //total_price - shipping_cost
+                            $wPrepare = $pdo->prepare("SELECT bracket_upper, cost FROM Brackets");
+                            $wPrepare->execute();
+                            $weight = $wPrepare->fetch(PDO::FETCH_NUM);
+                            while($weight) {
+                                if($row[2] >= $weight[0]) {
+                                    $shippingCost = $weight[1];
+                                }
+                                else {
+                                    break;
+                                }
+                                $weight = $wPrepare->fetch(PDO::FETCH_NUM);
+                            }
+                            $subtotal = $row[1];
                             echo "<p>Subtotal: $$subtotal</p>";
-                            echo "<p>Shipping: $$row[5]</p>";
-                            echo "<p>Total: $$row[1]</p>";
+                            echo "<p>Shipping: $$shippingCost</p>";
+                            $total = $row[1] + $shippingCost;
+                            echo "<p>Total: $$total</p>";
                             echo "<h3>Shipping Confirmation:</h3>";
                             echo "<p>$custRow[0]</p>";  //name
-                            echo "<p>$custRow[2]</p>";  //address
-                            echo "<p>Order confirmation sent to: $custRow[1]</p>";  //email
-
-                            //Mark as Shipped Button
-                            if($row[3] != "Shipped") {
-                            echo "<div class=\"button\">";
-                            echo "    <form method=\"post\">";
-                            echo "         <button href=\"#\" type=\"submit\" name=\"shipButton\" value=\"$row[0]\">Mark Order $row[0] as Shipped</button>";
-                            echo "    </form>";
-                            echo "</div>"; }
-
+                            echo "<p>$custRow[1]</p>";  //street
+                            echo "<p>$custRow[2]</p>";  //city
+                            echo "<p>Order confirmation sent to: $custRow[3]</p>";  //email
                             //X to close popup
-                            echo "<a href=\"#\" style=\"position:absolute; color: #fe0606; 
-                                                        top:10px; right:10px\">&times;</a>                                    
-                                    </div>
+                            echo "</div>
                                 </div>";
                             echo "</tr>";
                         $row = $prepared->fetch(PDO::FETCH_NUM);
