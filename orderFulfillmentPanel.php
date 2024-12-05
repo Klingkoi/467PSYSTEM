@@ -171,6 +171,7 @@
                             $subtotal = number_format($row[1] - $row[5], 2); //total_price - shipping_cost
                             $shipping = number_format($row[5], 2); //rounding to 2 places
                             $total = number_format($row[1], 2); 
+                            echo "<p>Total weight: $row[2] lbs.</p>";
                             echo "<p>Subtotal: $$subtotal</p>";
                             echo "<p>Shipping: $$shipping</p>";
                             echo "<p>Total: $$total</p>";

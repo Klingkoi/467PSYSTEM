@@ -18,7 +18,7 @@ CREATE TABLE orders (
     customer_id INT NOT NULL,
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     total_price FLOAT(10, 2) NOT NULL,
-    total_weight FLOAT(4, 2) NOT NULL,
+    total_weight FLOAT(10, 2) NOT NULL,
     shipping_cost FLOAT(10, 2) NOT NULL,
     order_status ENUM('Authorized', 'Packed', 'Shipped', 'Completed') DEFAULT 'Authorized',
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
@@ -48,7 +48,6 @@ CREATE TABLE admins (
     password_hash VARCHAR(255) NOT NULL
 );
 
--- Arbitrary sample data
 
 -- Insert sample data into inventory table
 INSERT INTO inventory (part_number, quantity_on_hand) VALUES
@@ -78,38 +77,37 @@ INSERT INTO inventory (part_number, quantity_on_hand) VALUES
 (139, 185), (140, 135), (141, 65), (142, 175), (143, 200), (144, 95),
 (145, 50), (146, 125), (147, 130), (148, 100), (149, 155);
 
--- Insert sample data into orders table
-INSERT INTO orders (customer_id, total_price, total_weight, shipping_cost, order_status) VALUES
-(1, 45.97, 3.5, 5.99, 'Authorized'),
-(2, 12.98, 0.2, 2.99, 'Authorized'),
-(3, 25.67, 3.0, 3.99, 'Authorized'),
-(4, 75.25, 5.0, 6.99, 'Authorized'),
-(5, 25.50, 1.0, 3.99, 'Authorized'),
-(6, 150.75, 8.5, 11.99, 'Authorized'),
-(7, 33.20, 2.3, 4.99, 'Authorized'),
-(8, 90.50, 7.0, 9.99, 'Authorized'),
-(9, 55.10, 4.2, 5.99, 'Authorized'),
-(10, 40.75, 3.1, 5.99, 'Authorized'),
-(1, 80.20, 6.0, 7.99, 'Authorized'),
-(2, 19.99, 0.5, 2.99, 'Authorized'),
-(3, 99.99, 10.0, 10.99, 'Authorized'),
-(4, 65.40, 4.8, 6.99, 'Authorized'),
-(5, 14.50, 0.3, 2.99, 'Authorized'),
-(6, 130.80, 9.0, 10.99, 'Authorized'),
-(7, 45.30, 3.7, 5.99, 'Authorized'),
-(8, 87.20, 6.5, 8.99, 'Authorized'),
-(9, 30.99, 2.0, 4.99, 'Authorized'),
-(10, 110.75, 8.2, 11.99, 'Authorized'),
-(1, 57.60, 4.5, 6.99, 'Authorized'),
-(2, 23.50, 1.2, 3.99, 'Authorized'),
-(3, 175.25, 10.0, 11.99, 'Authorized'),
-(4, 50.80, 3.9, 6.99, 'Authorized'),
-(5, 35.70, 2.8, 4.99, 'Authorized'),
-(6, 95.90, 7.3, 9.99, 'Authorized'),
-(7, 67.50, 5.2, 7.99, 'Authorized'),
-(8, 28.99, 1.8, 4.99, 'Authorized'),
-(9, 145.20, 9.5, 10.99, 'Authorized'),
-(10, 62.40, 4.7, 7.99, 'Authorized');
+-- Insert accurate values into orders table with comments showing the math for price and weight
+-- Order 1: Total price = (1 * 178.76) + (1 * 23.37) + 0.00 (shipping for weight 3.05) = 202.13, Total weight = (1 * 0.55) + (1 * 2.50) = 3.05
+INSERT INTO orders (order_id, customer_id, total_price, total_weight, shipping_cost, order_status) VALUES
+(1, 1, 202.13, 3.05, 0.00, 'Authorized'),
+
+-- Order 2: Total price = (1 * 23.37) + 0.00 (shipping for weight 2.50) = 23.37, Total weight = (1 * 2.50) = 2.50
+(2, 2, 23.37, 2.50, 0.00, 'Authorized'),
+
+-- Order 3: Total price = (1 * 157.46) + 0.00 (shipping for weight 2.00) = 157.46, Total weight = (1 * 2.00) = 2.00
+(3, 3, 157.46, 2.00, 0.00, 'Authorized'),
+
+-- Order 4: Total price = (2 * 178.76) + 0.00 (shipping for weight 1.10) = 357.52, Total weight = (2 * 0.55) = 1.10
+(4, 4, 357.52, 1.10, 0.00, 'Authorized'),
+
+-- Order 5: Total price = (3 * 36.58) + 1.50 (shipping for weight 6.00) = 111.24, Total weight = (3 * 2.00) = 6.00
+(5, 5, 111.24, 6.00, 1.50, 'Authorized'),
+
+-- Order 6: Total price = (4 * 23.37) + 1.50 (shipping for weight 10.00) = 94.98, Total weight = (4 * 2.50) = 10.00
+(6, 6, 94.98, 10.00, 1.50, 'Authorized'),
+
+-- Order 7: Total price = (5 * 315.94) + 10.00 (shipping for weight 17.50) = 1589.70, Total weight = (5 * 3.50) = 17.50
+(7, 7, 1589.70, 17.50, 10.00, 'Authorized'),
+
+-- Order 8: Total price = (8 * 711.14) + 125.99 (shipping for weight 799.92) = 5815.11, Total weight = (8 * 99.99) = 799.92
+(8, 8, 5815.11, 799.92, 125.99, 'Authorized'),
+
+-- Order 9: Total price = (12 * 177.79) + 30.00 (shipping for weight 149.40) = 2163.48, Total weight = (12 * 12.45) = 149.40
+(9, 9, 2163.48, 149.40, 30.00, 'Authorized'),
+
+-- Order 10: Total price = (20 * 1.85) + 15.00 (shipping for weight 70.00) = 52.00, Total weight = (20 * 3.50) = 70.00
+(10, 10, 52.00, 70.00, 15.00, 'Authorized');
 
 -- Insert sample data into order_details table
 INSERT INTO order_details (order_id, part_number, quantity) VALUES
@@ -120,30 +118,11 @@ INSERT INTO order_details (order_id, part_number, quantity) VALUES
 (4, 1, 2),
 (5, 3, 3),
 (6, 2, 4),
-(7, 1, 1),
-(8, 4, 2),
-(9, 3, 1),
-(10, 2, 3),
-(11, 1, 2),
-(12, 4, 1),
-(13, 3, 2),
-(14, 2, 4),
-(15, 1, 3),
-(16, 4, 1),
-(17, 3, 2),
-(18, 2, 3),
-(19, 1, 1),
-(20, 4, 2),
-(21, 3, 3),
-(22, 2, 4),
-(23, 1, 1),
-(24, 4, 2),
-(25, 3, 1),
-(26, 2, 3),
-(27, 1, 2),
-(28, 4, 1),
-(29, 3, 2),
-(30, 2, 3);
+(7, 5, 5),
+(8, 8, 8),
+(9, 6, 12),
+(10, 15, 20);
+
 
 -- Insert sample data into shipping_charges table
 INSERT INTO shipping_charges (weight_lower_bound, weight_upper_bound, charge) VALUES
