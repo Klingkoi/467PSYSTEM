@@ -119,12 +119,12 @@
                     $row = $preparedOrder->fetch(PDO::FETCH_NUM);            
                     while($row) {
                         echo "<tr>";
-                            echo "<td>Order #$row[0]</td>";
-                            echo "<td>$$row[1]</td>";
-                            echo "<td>$row[2]</td>";
-                            //Complete order button
+                            echo "<td>Order #$row[0]</td>"; //Order ID
+                            echo "<td>$" . number_format($row[1], 2) . "</td>"; //Order Total (USD)
+                            echo "<td>$row[2]</td>"; //Weight Total (lbs)
+                            //Complete order button / Status
                             if($row[3] == "Shipped" || $row[3] == "Completed") {
-                                echo "<td>Shipped! Email sent!</td>";
+                                echo "<td>Shipped! Confirmation Sent!</td>";
                             } else {
                                 echo "<td>
                                             <div class=\"button\">
@@ -138,7 +138,7 @@
                             $legacyprepared = $legacypdo->prepare("SELECT * FROM parts ORDER BY number ASC");
             
                             $prepared->execute();
-                            $inventory = $prepared->fetchAll(PDO::FETCH_ASSOC);      
+                            $order_detail = $prepared->fetchAll(PDO::FETCH_ASSOC);      
 
                             $legacyprepared->execute();
                             $parts = $legacyprepared->fetchAll(PDO::FETCH_ASSOC);   
@@ -153,15 +153,6 @@
                                         $joinedDetailsAndInventory[] = array_merge($entry, $part);
                                 }
                             }
-
-                            // // $preparedParts = $pdo->prepare("SELECT order_details.part_number, order_details.quantity,
-                            // //                                     parts.description, parts.price
-                            // //                                     FROM order_details 
-                            // //                                     INNER JOIN parts ON parts.number = order_details.part_number
-                            // //                                     WHERE order_details.order_id = $row[0]
-                            // //                                     ORDER BY parts.number ASC");
-                            // // $preparedParts->execute();
-                            // // $partRow = $preparedParts->fetch(PDO::FETCH_NUM);   
                             
                             $preparedCustomer = $legacypdo->prepare("SELECT name, street, city, contact FROM customers 
                                                        WHERE id = $row[4]");
@@ -175,17 +166,19 @@
                             echo "<h3>Packing List/Invoice:</h3>";
                             foreach($joinedDetailsAndInventory as $partRow) {
                                 $partTempTotal = $partRow["price"] * $partRow["quantity"];
-                                echo '<p>$partRow["description"] x $partRow["quantity"] ($$partRow["price"] x $partRow["quantity"] = $$partTempTotal)</p>';
+                                echo "<p>{$partRow["description"]} x {$partRow["quantity"]} (\${$partRow["price"]} x {$partRow["quantity"]} = \${$partTempTotal})</p>";
                             }
-                            $subtotal = $row[1] - $row[5]; //total_price - shipping_cost
+                            $subtotal = number_format($row[1] - $row[5], 2); //total_price - shipping_cost
+                            $shipping = number_format($row[5], 2); //rounding to 2 places
+                            $total = number_format($row[1], 2); 
                             echo "<p>Subtotal: $$subtotal</p>";
-                            echo "<p>Shipping: $$row[5]</p>";
-                            echo "<p>Total: $$row[1]</p>";
+                            echo "<p>Shipping: $$shipping</p>";
+                            echo "<p>Total: $$total</p>";
                             echo "<h3>Shipping Confirmation:</h3>";
                             echo "<p>$custRow[0]</p>";  //name
                             echo "<p>$custRow[1]</p>";  //street
                             echo "<p>$custRow[2]</p>";  //city
-                            echo "<p>Order confirmation sent to: $custRow[3]</p>";  //email
+                            echo "<p>Check confirmation at: $custRow[3]</p>";  //email
 
                             //Mark as Shipped Button
                             if($row[3] != "Shipped") {
