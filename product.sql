@@ -48,6 +48,7 @@ CREATE TABLE admins (
     password_hash VARCHAR(255) NOT NULL
 );
 
+-- Sample Data
 
 -- Insert sample data into inventory table
 INSERT INTO inventory (part_number, quantity_on_hand) VALUES
@@ -78,35 +79,16 @@ INSERT INTO inventory (part_number, quantity_on_hand) VALUES
 (145, 50), (146, 125), (147, 130), (148, 100), (149, 155);
 
 -- Insert accurate values into orders table with comments showing the math for price and weight
--- Order 1: Total price = (1 * 178.76) + (1 * 23.37) + 0.00 (shipping for weight 3.05) = 202.13, Total weight = (1 * 0.55) + (1 * 2.50) = 3.05
 INSERT INTO orders (order_id, customer_id, total_price, total_weight, shipping_cost, order_status) VALUES
 (1, 1, 202.13, 3.05, 0.00, 'Authorized'),
-
--- Order 2: Total price = (1 * 23.37) + 0.00 (shipping for weight 2.50) = 23.37, Total weight = (1 * 2.50) = 2.50
 (2, 2, 23.37, 2.50, 0.00, 'Authorized'),
-
--- Order 3: Total price = (1 * 157.46) + 0.00 (shipping for weight 2.00) = 157.46, Total weight = (1 * 2.00) = 2.00
 (3, 3, 157.46, 2.00, 0.00, 'Authorized'),
-
--- Order 4: Total price = (2 * 178.76) + 0.00 (shipping for weight 1.10) = 357.52, Total weight = (2 * 0.55) = 1.10
 (4, 4, 357.52, 1.10, 0.00, 'Authorized'),
-
--- Order 5: Total price = (3 * 36.58) + 1.50 (shipping for weight 6.00) = 111.24, Total weight = (3 * 2.00) = 6.00
 (5, 5, 111.24, 6.00, 1.50, 'Authorized'),
-
--- Order 6: Total price = (4 * 23.37) + 1.50 (shipping for weight 10.00) = 94.98, Total weight = (4 * 2.50) = 10.00
 (6, 6, 94.98, 10.00, 1.50, 'Authorized'),
-
--- Order 7: Total price = (5 * 315.94) + 10.00 (shipping for weight 17.50) = 1589.70, Total weight = (5 * 3.50) = 17.50
 (7, 7, 1589.70, 17.50, 10.00, 'Authorized'),
-
--- Order 8: Total price = (8 * 711.14) + 125.99 (shipping for weight 799.92) = 5815.11, Total weight = (8 * 99.99) = 799.92
 (8, 8, 5815.11, 799.92, 125.99, 'Authorized'),
-
--- Order 9: Total price = (12 * 177.79) + 30.00 (shipping for weight 149.40) = 2163.48, Total weight = (12 * 12.45) = 149.40
 (9, 9, 2163.48, 149.40, 30.00, 'Authorized'),
-
--- Order 10: Total price = (20 * 1.85) + 15.00 (shipping for weight 70.00) = 52.00, Total weight = (20 * 3.50) = 70.00
 (10, 10, 52.00, 70.00, 15.00, 'Authorized');
 
 -- Insert sample data into order_details table
