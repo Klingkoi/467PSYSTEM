@@ -106,9 +106,9 @@
                 <!-- Table headers -->
                 <th colspan="7" style="background-color:White">Inventory</th>
                 <tr>
-                    <th style="background-color:White">Order ID</th>
-                    <th style="background-color:White">Order Total (USD)</th>
-                    <th style="background-color:White">Weight Total (lbs)</th>
+                    <th style="background-color:White; width:5%;">Order ID</th>
+                    <th style="background-color:White; width:5%;">Order Total (USD)</th>
+                    <th style="background-color:White; width:5%;">Weight Total (lbs)</th>
                     <th style="background-color:White">Status</th>
                 </tr>
                 <!-- Table data -->
@@ -124,7 +124,7 @@
                             echo "<td>$row[2]</td>";
                             //Complete order button
                             if($row[3] == "Shipped" || $row[3] == "Completed") {
-                                echo "<td>Shipped!</td>";
+                                echo "<td>Shipped! Email sent!</td>";
                             } else {
                                 echo "<td>
                                             <div class=\"button\">
