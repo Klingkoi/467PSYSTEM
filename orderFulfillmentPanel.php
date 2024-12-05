@@ -1,7 +1,14 @@
-
 <?php
   include('secret.php');
 
+  try {
+    $dsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
+    $legacypdo = new PDO($dsn, $legacyUsername, $legacyPassword);
+    $legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  }
+  catch (PDOexception $e) {
+    echo "Connection to database failed: ".$e->getMessage();
+  } 
 
   try {
     $dsn = "mysql:host=courses;dbname=".$username;
@@ -127,17 +134,37 @@
                             } 
 
                             //Prepare part listing with quantity
-                            $preparedParts = $pdo->prepare("SELECT order_details.part_number, order_details.quantity,
-                                                                parts.description, parts.price
-                                                                FROM order_details 
-                                                                INNER JOIN parts ON parts.number = order_details.part_number
-                                                                WHERE order_details.order_id = $row[0]
-                                                                ORDER BY parts.number ASC");
-                            $preparedParts->execute();
-                            $partRow = $preparedParts->fetch(PDO::FETCH_NUM);   
+                            $prepared = $pdo->prepare("SELECT * FROM order_details ORDER BY part_number ASC");
+                            $legacyprepared = $legacypdo->prepare("SELECT * FROM parts ORDER BY number ASC");
+            
+                            $prepared->execute();
+                            $inventory = $prepared->fetchAll(PDO::FETCH_ASSOC);      
+
+                            $legacyprepared->execute();
+                            $parts = $legacyprepared->fetchAll(PDO::FETCH_ASSOC);   
                             
-                            $preparedCustomer = $pdo->prepare("SELECT name, email, address FROM customers 
-                                                       WHERE customer_id = $row[4]");
+                            //Join Tables with arrays since can't join tables from 2 different PDOs
+                            $joinedDetailsAndInventory = [];
+                            foreach($order_detail as $entry)
+                            {
+                                foreach ($parts as $part) {
+                                    //if order_details.part_number == parts.number
+                                    if($entry["part_number"] == $part["number"] && $entry["order_id"] == $row[0])
+                                        $joinedDetailsAndInventory[] = array_merge($entry, $part);
+                                }
+                            }
+
+                            // // $preparedParts = $pdo->prepare("SELECT order_details.part_number, order_details.quantity,
+                            // //                                     parts.description, parts.price
+                            // //                                     FROM order_details 
+                            // //                                     INNER JOIN parts ON parts.number = order_details.part_number
+                            // //                                     WHERE order_details.order_id = $row[0]
+                            // //                                     ORDER BY parts.number ASC");
+                            // // $preparedParts->execute();
+                            // // $partRow = $preparedParts->fetch(PDO::FETCH_NUM);   
+                            
+                            $preparedCustomer = $legacypdo->prepare("SELECT name, street, city, contact FROM customers 
+                                                       WHERE id = $row[4]");
                             $preparedCustomer->execute();
                             $custRow = $preparedCustomer->fetch(PDO::FETCH_NUM);   
 
@@ -146,10 +173,9 @@
                                     <div class=\"content\">
                                         <h1>Order $row[0]</h1>";
                             echo "<h3>Packing List/Invoice:</h3>";
-                            while($partRow) {
-                                $partTempTotal = $partRow[3] * $partRow[1];
-                                echo "<p>$partRow[2] x $partRow[1] ($$partRow[3] x $partRow[1] = $$partTempTotal)</p>";
-                                $partRow = $preparedParts->fetch(PDO::FETCH_NUM);
+                            foreach($joinedDetailsAndInventory as $partRow) {
+                                $partTempTotal = $partRow["price"] * $partRow["quantity"];
+                                echo '<p>$partRow["description"] x $partRow["quantity"] ($$partRow["price"] x $partRow["quantity"] = $$partTempTotal)</p>';
                             }
                             $subtotal = $row[1] - $row[5]; //total_price - shipping_cost
                             echo "<p>Subtotal: $$subtotal</p>";
@@ -157,8 +183,9 @@
                             echo "<p>Total: $$row[1]</p>";
                             echo "<h3>Shipping Confirmation:</h3>";
                             echo "<p>$custRow[0]</p>";  //name
-                            echo "<p>$custRow[2]</p>";  //address
-                            echo "<p>Order confirmation sent to: $custRow[1]</p>";  //email
+                            echo "<p>$custRow[1]</p>";  //street
+                            echo "<p>$custRow[2]</p>";  //city
+                            echo "<p>Order confirmation sent to: $custRow[3]</p>";  //email
 
                             //Mark as Shipped Button
                             if($row[3] != "Shipped") {

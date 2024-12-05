@@ -1,6 +1,14 @@
 <?php
   include('secret.php');
-  //include('js.php');
+
+  try {
+    $dsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
+    $legacypdo = new PDO($dsn, $legacyUsername, $legacyPassword);
+    $legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  }
+  catch (PDOexception $e) {
+    echo "Connection to database failed: ".$e->getMessage();
+  } 
 
   try {
     $dsn = "mysql:host=courses;dbname=".$username;
@@ -66,16 +74,13 @@
     </style>
 
     </div> 
-        
-
-
         <div class="div2" id="Qs">
             <form action="" method="post">
                 <label for="part">Pick an part to update the quantity of: </label>
                 <!-- Create Dropdown of parts to update -->
                 <select name="dropdown" id="dropdown">
                     <?php
-                        $prepared = $pdo->prepare("SELECT number,description FROM parts ORDER BY number ASC");
+                        $prepared = $legacypdo->prepare("SELECT number,description FROM parts ORDER BY number ASC");
                         $prepared->execute();
                         $row = $prepared->fetch(PDO::FETCH_NUM);            
                         while($row) {
@@ -104,8 +109,8 @@
                 <!-- Table headers -->
                 <th colspan="7" style="background-color:White">Inventory</th>
                 <tr>
-                    <th style="background-color:White">Inventory ID</th>
-                    <th style="background-color:White">Part Number</th>
+                    <th style="background-color:White; width:5%;">Inventory ID</th>
+                    <th style="background-color:White; width:5%;">Part Number</th>
                     <th style="background-color:White">Description</th>
                     <th style="background-color:White">Price (USD)</th>
                     <th style="background-color:White">Weight (lbs)</th>
@@ -114,20 +119,38 @@
                 </tr>
                 <!-- Table data -->
                 <?php
-                    $prepared = $pdo->prepare("SELECT * FROM inventory INNER JOIN parts ON inventory.part_number = parts.number ORDER BY part_number ASC");
+                    //$prepared = $pdo->prepare("SELECT * FROM inventory INNER JOIN parts ON inventory.part_number = parts.number ORDER BY part_number ASC");
+                    $prepared = $pdo->prepare("SELECT * FROM inventory ORDER BY part_number ASC");
+                    $legacyprepared = $legacypdo->prepare("SELECT * FROM parts ORDER BY number ASC");
+    
                     $prepared->execute();
-                    $row = $prepared->fetch(PDO::FETCH_NUM);            
-                    while($row) {
+                    $inventory = $prepared->fetchAll(PDO::FETCH_ASSOC);      
+
+                    $legacyprepared->execute();
+                    $parts = $legacyprepared->fetchAll(PDO::FETCH_ASSOC);   
+                    
+                    //Join Tables with arrays since can't join tables from 2 different PDOs
+                    $joinedPartsAndInventory = [];
+                    foreach($inventory as $entry)
+                    {
+                        foreach ($parts as $part) {
+                            //if inventory.part_number == parts.number
+                            if($entry["part_number"] == $part["number"])
+                                $joinedPartsAndInventory[] = array_merge($entry, $part);
+                        }
+                    }
+
+                    //add rows
+                    foreach($joinedPartsAndInventory as $row) {
                         echo "<tr>";
-                            echo "<td>$row[0]</td>";
-                            echo "<td>$row[1]</td>";
-                            echo "<td>$row[4]</td>";
-                            echo "<td>$$row[5]</td>";
-                            echo "<td>$row[6]</td>";
-                            echo "<td><img src=\"$row[7]\" width=\"100\"</td>"; 
-                            echo "<td style=\"font-weight: bold\">$row[2]</td>";
-                        echo "</tr>";
-                        $row = $prepared->fetch(PDO::FETCH_NUM);  
+                            echo "<td>".$row["inventory_id"]."</td>";
+                            echo "<td>".$row["part_number"]."</td>";
+                            echo "<td>".$row["description"]."</td>";
+                            echo "<td>".$row["price"]."</td>";
+                            echo "<td>".$row["weight"]."</td>";
+                            echo "<td><img src=\"".$row["pictureURL"]."\" width=\"100\"></td>"; 
+                            echo "<td style=\"font-weight: bold\">".$row["quantity_on_hand"]."</td>";
+                        echo "</tr>"; 
                     }
                 ?>
             </table> </br> <!-- End of table -->
