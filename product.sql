@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS inventory, customers, orders, order_details, shipping_charges, admins;
+DROP TABLE IF EXISTS inventory, customers, orders, order_details, shipping_charges, admins, Brackets;
 DROP TABLE IF EXISTS parts;
 --
 CREATE TABLE parts (
@@ -43,12 +43,12 @@ CREATE TABLE order_details (
     FOREIGN KEY (part_number) REFERENCES parts(number)
 );
 --
-CREATE TABLE shipping_charges (
-    charge_id INT AUTO_INCREMENT PRIMARY KEY,
-    weight_lower_bound FLOAT(5, 2) NOT NULL,
-    weight_upper_bound FLOAT(5, 2) NOT NULL,
-    charge FLOAT(10, 2) NOT NULL
-);
+
+CREATE TABLE Brackets (
+	bracket_upper INT PRIMARY KEY,
+	cost float(6,2) NOT NULL);
+
+INSERT INTO Brackets VALUES(0, 0);
 --
 CREATE TABLE admins (
     admin_id INT AUTO_INCREMENT PRIMARY KEY,
